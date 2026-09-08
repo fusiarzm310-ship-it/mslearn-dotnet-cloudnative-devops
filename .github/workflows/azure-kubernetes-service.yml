@@ -30,7 +30,23 @@ jobs:
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
+      - name: Login to ACR
+        run: az acr login --name acseshop3058087593
+      
+      - name: Build image
+        run: |
+          docker build \
+            -f ./DockerfileProducts.acr \
+            -t acseshop3058087593.azurecr.io/productservice:${{ github.sha }} \
+            .
+      
+      - name: Push image
+        run: |
+          docker push \
+            acseshop3058087593.azurecr.io/productservice:${{ github.sha }}
+            
       # Builds and pushes an image up to your Azure Container Registry
       - name: Build and push image to ACR
+        if: false
         run: |
           az acr build --file ${{ env.DOCKER_PATH }} --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} .
